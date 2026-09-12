@@ -134,7 +134,7 @@
   .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 16px 32px -8px color-mix(in oklab, var(--primary) 28%, transparent); }
   .btn-ghost { background: transparent; color: var(--foreground); border-color: var(--border); }
   .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-  .btn-sm { padding: 9px 16px; font-size: 0.85rem; }
+  .btn-sm { padding: 11px 16px; font-size: 0.85rem; }
 
   /* -- hero -- */
   .hero { padding: 88px 0 72px; }
@@ -220,6 +220,7 @@
     border-radius: var(--radius); padding: 11px 13px; color: var(--foreground);
   }
   .field textarea { resize: vertical; min-height: 70px; }
+  .field input::placeholder, .field textarea::placeholder { color: var(--muted-foreground); opacity: 1; }
   .field input:focus, .field textarea:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
   .consent { display: flex; align-items: flex-start; gap: 10px; font-size: 0.85rem; color: var(--muted-foreground); margin-bottom: 22px; }
   .consent input { margin-top: 3px; }
@@ -265,6 +266,8 @@
       <a href="#acceso" class="btn btn-primary btn-sm">Quiero enterarme</a>
     </div>
   </header>
+
+  <main>
 
   <section class="hero">
     <div class="wrap hero-grid">
@@ -357,25 +360,25 @@
       <div class="shots">
         <div class="shot">
           <figure>
-            <img src="screens/coverflow.png" alt="Ficha visual de un vino en CataLog, con foto real de la botella y datos de servicio" width="496" height="914" />
+            <img src="screens/coverflow.png" alt="Ficha visual de un vino en CataLog, con foto real de la botella y datos de servicio" width="496" height="914" loading="lazy" decoding="async" />
             <figcaption>Ficha visual de cada botella, con foto real.</figcaption>
           </figure>
         </div>
         <div class="shot">
           <figure>
-            <img src="screens/sommelier.png" alt="Chat del Sommelier IA de CataLog guiando una cata paso a paso" width="501" height="913" />
+            <img src="screens/sommelier.png" alt="Chat del Sommelier IA de CataLog guiando una cata paso a paso" width="501" height="913" loading="lazy" decoding="async" />
             <figcaption>Sommelier IA: guía la cata y arma la ficha solo.</figcaption>
           </figure>
         </div>
         <div class="shot">
           <figure>
-            <img src="screens/detalle.png" alt="Detalle de un vino en CataLog, con temperatura de servicio sugerida y notas de cata" width="498" height="915" />
+            <img src="screens/detalle.png" alt="Detalle de un vino en CataLog, con temperatura de servicio sugerida y notas de cata" width="498" height="915" loading="lazy" decoding="async" />
             <figcaption>Temperatura de servicio y notas de cata.</figcaption>
           </figure>
         </div>
         <div class="shot">
           <figure>
-            <img src="screens/stats.png" alt="Panel de estadísticas de CataLog con KPIs de consumo" width="493" height="911" />
+            <img src="screens/stats.png" alt="Panel de estadísticas de CataLog con KPIs de consumo" width="493" height="911" loading="lazy" decoding="async" />
             <figcaption>Estadísticas de consumo de cada usuario.</figcaption>
           </figure>
         </div>
@@ -446,6 +449,8 @@
       <p class="signup-alt">¿Preferís algo más directo? <a href="mailto:franciscoaucar@ajconsultingit.com?subject=CataLog%20para%20vinotecas">Escribinos por mail</a>.</p>
     </div>
   </section>
+
+  </main>
 
   <footer>
     <div class="wrap">
