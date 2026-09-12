@@ -83,6 +83,7 @@
   h1, h2, h3, .serif { font-family: var(--font-serif); font-weight: 600; letter-spacing: -0.02em; }
   a { color: inherit; }
   img { max-width: 100%; display: block; }
+  .icon-inline { width: 1em; height: 1em; vertical-align: -0.15em; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
   .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
   section { padding: 96px 0; }
   section + section { border-top: 1px solid var(--border); }
@@ -151,6 +152,14 @@
     background: var(--muted); border-radius: var(--radius); padding: 16px 18px;
     font-style: italic; font-size: 0.95rem; color: var(--foreground);
   }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+  .typewriter-caret {
+    display: inline-block; width: 2px; height: 1em; margin-left: 1px;
+    background: var(--accent); vertical-align: -0.15em;
+    animation: caret-blink 0.8s step-end infinite;
+  }
+  .typewriter-caret.done { display: none; }
+  @keyframes caret-blink { 50% { opacity: 0; } }
   .demo-label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted-foreground); margin-bottom: 8px; display: block; }
   .demo-arrow { text-align: center; color: var(--accent); font-size: 1.3rem; }
   .demo-signal { background: var(--foreground); color: var(--background); border-radius: var(--radius); padding: 18px; }
@@ -183,17 +192,36 @@
   .wishlist-row:last-child { border-bottom: none; }
   .wishlist-count { font-weight: 700; color: var(--primary); }
 
-  /* -- product screenshots -- */
+  /* -- product screenshots: carrusel con scroll-snap nativo, misma idea que
+     el scrollbar de Swiper pero sin sumar la libreria -- */
   .product .wrap { text-align: center; }
   .product h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); margin: 0 0 8px; }
-  .product .honest { color: var(--muted-foreground); margin: 0 0 48px; font-size: 1rem; }
-  .shots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; text-align: left; }
+  .product .honest { color: var(--muted-foreground); margin: 0 0 40px; font-size: 1rem; }
+  .shots {
+    display: flex; gap: 24px; text-align: left;
+    overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-left: 24px;
+    padding: 4px 24px 4px 0; margin: 0 -24px;
+    scrollbar-width: none;
+  }
+  .shots::-webkit-scrollbar { display: none; }
+  .shot { flex: 0 0 clamp(220px, 26vw, 280px); scroll-snap-align: start; }
   .shot figure { margin: 0; }
   .shot img {
     width: 100%; border-radius: var(--radius-xl); border: 1px solid var(--border);
     box-shadow: 0 16px 32px -16px rgba(28,25,23,0.25);
   }
   .shot figcaption { margin-top: 14px; font-size: 0.92rem; color: var(--muted-foreground); }
+  .shots-scrollbar {
+    max-width: 200px; height: 4px; margin: 28px auto 0; border-radius: 999px;
+    background: var(--border); overflow: hidden;
+  }
+  .shots-scrollbar-thumb {
+    height: 100%; width: 25%; border-radius: 999px; background: var(--accent);
+    transition: transform 0.1s linear;
+  }
+  @media (max-width: 520px) {
+    .shot { flex-basis: 78vw; }
+  }
 
   /* -- honesty / status -- */
   .status { text-align: center; }
@@ -231,6 +259,25 @@
   .signup-alt { margin-top: 16px; font-size: 0.9rem; color: var(--muted-foreground); text-align: center; }
   .signup-alt a { color: var(--primary); font-weight: 600; text-decoration: underline; }
 
+  /* -- success check: representa a un cliente sumandose (submit del form) -- */
+  .form-success {
+    max-width: 480px; margin: 0 auto; padding: 48px 36px;
+    display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center;
+  }
+  .success-check { width: 64px; height: 64px; }
+  .success-check-circle {
+    stroke: var(--success); stroke-width: 2;
+    stroke-dasharray: 145; stroke-dashoffset: 145;
+  }
+  .success-check-mark {
+    stroke: var(--success); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 40; stroke-dashoffset: 40;
+  }
+  .form-success.playing .success-check-circle { animation: draw-check 0.5s ease forwards; }
+  .form-success.playing .success-check-mark { animation: draw-check 0.35s ease 0.45s forwards; }
+  @keyframes draw-check { to { stroke-dashoffset: 0; } }
+  .form-success p { font-size: 1.05rem; margin: 0; color: var(--foreground); }
+
   /* -- footer -- */
   footer { padding: 40px 0; }
   footer .wrap { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
@@ -260,10 +307,8 @@
     .demo-card .demo-signal { opacity: 1; transform: none; transition: none; }
     .demo-card.poured .demand-badge { animation: none; }
     #heroCanvas { display: none; }
-  }
-
-  @media (max-width: 980px) {
-    .shots { grid-template-columns: repeat(2, 1fr); }
+    .success-check-circle, .success-check-mark { stroke-dashoffset: 0; animation: none; }
+    .typewriter-caret { animation: none; }
   }
 
   @media (max-width: 860px) {
@@ -273,10 +318,6 @@
     .feature-row { grid-template-columns: 1fr; gap: 28px; margin-bottom: 56px; }
     .feature-row:nth-child(even) .feature-copy { order: 0; }
     header .brand-tag { display: none; }
-  }
-
-  @media (max-width: 520px) {
-    .shots { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -311,14 +352,17 @@
       <div class="paper-card demo-card" id="demoCard">
         <div>
           <span class="demo-label">Su lista de deseos</span>
-          <div class="demo-you-said">"Cabernet Franc, Valle de Uco — para probar cuando consiga."</div>
+          <div class="demo-you-said" id="demoQuote" data-text='&quot;Cabernet Franc, Valle de Uco — para probar cuando consiga.&quot;'>
+            <span class="sr-only">"Cabernet Franc, Valle de Uco — para probar cuando consiga."</span>
+            <span class="typewriter-text" aria-hidden="true"></span><span class="typewriter-caret" aria-hidden="true"></span>
+          </div>
         </div>
         <div class="demo-arrow">↓</div>
         <div class="demo-signal">
           <span class="demo-label">Señal de pedido</span>
           <div class="wine-name">Cabernet Franc</div>
           <div class="wine-meta">Valle de Uco, Mendoza</div>
-          <span class="demand-badge">🍷 3 clientes de tu vinoteca lo guardaron esta semana</span>
+          <span class="demand-badge"><svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 22h8"/><path d="M7 10h10"/><path d="M12 15v7"/><path d="M12 15a5 5 0 0 0 5-5c0-2-.5-4-2-8H9c-1.5 4-2 6-2 8a5 5 0 0 0 5 5Z"/></svg> 3 clientes de tu vinoteca lo guardaron esta semana</span>
         </div>
         <p class="illustrative">Ejemplo ilustrativo</p>
       </div>
@@ -346,7 +390,7 @@
         </div>
         <div class="paper-card feature-visual">
           <div class="mini-label">Escaneo de etiqueta con IA</div>
-          <div class="wishlist-row"><span>📷 Foto de la etiqueta</span><span>→</span></div>
+          <div class="wishlist-row"><span><svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z"/><circle cx="12" cy="13" r="3"/></svg> Foto de la etiqueta</span><span>→</span></div>
           <div class="wishlist-row"><span>Bodega, cepa, añada</span><span class="wishlist-count">autocompletado</span></div>
         </div>
       </div>
@@ -410,6 +454,7 @@
           </figure>
         </div>
       </div>
+      <div class="shots-scrollbar" aria-hidden="true"><div class="shots-scrollbar-thumb" id="shotsThumb"></div></div>
     </div>
   </section>
 
@@ -473,6 +518,15 @@
         </label>
         <button type="submit" class="btn btn-primary">Quiero enterarme cuando esté disponible</button>
       </form>
+
+      <div class="form-success paper-card" id="formSuccess" hidden>
+        <svg class="success-check" viewBox="0 0 52 52" aria-hidden="true">
+          <circle class="success-check-circle" cx="26" cy="26" r="23" fill="none" />
+          <path class="success-check-mark" fill="none" d="M14 27l7 7 17-17" />
+        </svg>
+        <p>¡Gracias! Te vamos a escribir apenas se abra el acceso para vinotecas.</p>
+      </div>
+
       <p class="signup-alt">¿Preferís algo más directo? <a href="mailto:franciscoaucar@ajconsultingit.com?subject=CataLog%20para%20vinotecas">Escribinos por mail</a>.</p>
     </div>
   </section>
@@ -504,16 +558,48 @@
         nombre ? 'Nombre: ' + nombre : null,
         dolor ? 'Le cuesta: ' + dolor : null,
       ].filter(Boolean).join('%0D%0A');
-      window.location.href = 'mailto:franciscoaucar@ajconsultingit.com?subject=Acceso%20anticipado%20CataLog%20para%20vinotecas&body=' + body;
+      const mailtoUrl = 'mailto:franciscoaucar@ajconsultingit.com?subject=Acceso%20anticipado%20CataLog%20para%20vinotecas&body=' + body;
+
+      // Success check (representa al cliente sumandose) antes de abrir el mail.
+      const form = document.getElementById('leadForm');
+      const success = document.getElementById('formSuccess');
+      form.hidden = true;
+      success.hidden = false;
+      requestAnimationFrame(() => success.classList.add('playing'));
+      window.setTimeout(() => { window.location.href = mailtoUrl; }, 900);
     });
 
     // Efectos: reveal orquestado por scroll + "pour" de la demo card.
     // ponytail: sin librería de animación — 3 efectos puntuales alcanzan,
     // ver /impeccable audit de esta página para el criterio.
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Streaming-text: tipea la cita del cliente letra por letra. El texto
+    // completo ya vive en el DOM (accesible via .sr-only) — esto es puro
+    // adorno visual sobre un span aria-hidden, nunca reemplaza el contenido.
+    function streamText(el, onDone) {
+      const text = el.dataset.text || '';
+      const target = el.querySelector('.typewriter-text');
+      const caret = el.querySelector('.typewriter-caret');
+      let i = 0;
+      (function tick() {
+        target.textContent = text.slice(0, i);
+        i++;
+        if (i <= text.length) {
+          window.setTimeout(tick, 22 + Math.random() * 20);
+        } else {
+          caret.classList.add('done');
+          onDone && onDone();
+        }
+      })();
+    }
+
     if (reduceMotion) {
       document.querySelectorAll('.reveal').forEach((el) => el.classList.add('revealed'));
-      document.getElementById('demoCard')?.classList.add('poured');
+      const demoCard = document.getElementById('demoCard');
+      const quote = document.getElementById('demoQuote');
+      if (quote) { quote.querySelector('.typewriter-text').textContent = quote.dataset.text; quote.querySelector('.typewriter-caret').classList.add('done'); }
+      demoCard?.classList.add('poured');
     } else {
       const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
@@ -526,16 +612,39 @@
       document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
 
       const demoCard = document.getElementById('demoCard');
+      const demoQuote = document.getElementById('demoQuote');
       if (demoCard) {
         const demoObserver = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
-              entry.target.classList.add('poured');
+              if (demoQuote) {
+                streamText(demoQuote, () => entry.target.classList.add('poured'));
+              } else {
+                entry.target.classList.add('poured');
+              }
               demoObserver.unobserve(entry.target);
             }
           });
         }, { threshold: 0.4 });
         demoObserver.observe(demoCard);
+      }
+
+      // Carrusel de capturas: barra de progreso sincronizada con el scroll
+      // horizontal (el mismo trabajo que el modulo scrollbar de Swiper).
+      const shots = document.querySelector('.shots');
+      const thumb = document.getElementById('shotsThumb');
+      if (shots && thumb) {
+        function syncThumb() {
+          const max = shots.scrollWidth - shots.clientWidth;
+          const ratio = max > 0 ? shots.scrollLeft / max : 0;
+          const trackWidth = thumb.parentElement.clientWidth;
+          const thumbWidth = thumb.clientWidth;
+          thumb.style.transform = `translateX(${ratio * (trackWidth - thumbWidth)}px)`;
+        }
+        thumb.style.width = Math.max(20, (shots.clientWidth / shots.scrollWidth) * 100) + '%';
+        shots.addEventListener('scroll', syncThumb, { passive: true });
+        window.addEventListener('resize', syncThumb);
+        syncThumb();
       }
     }
 
