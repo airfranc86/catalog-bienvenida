@@ -257,6 +257,7 @@
   .field.invalid .field-error { display: block; }
   .consent { display: flex; align-items: flex-start; gap: 10px; font-size: 0.85rem; color: var(--muted-foreground); margin-bottom: 22px; }
   .consent.invalid { outline: 1px solid var(--destructive); outline-offset: 4px; border-radius: 2px; }
+  .hp-field { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
   .consent input { margin-top: 3px; }
   .consent a { color: var(--primary); text-decoration: underline; }
   form .btn-primary { width: 100%; }
@@ -518,6 +519,15 @@
           <input type="checkbox" id="consent" required />
           <span>Acepto la <a href="https://catalog-wines.vercel.app/privacidad">Política de Privacidad</a> y que me contacten sobre CataLog para vinotecas.</span>
         </label>
+
+        <!-- honeypot anti-bot: invisible para personas, los bots de spam
+             suelen completar cualquier input que encuentren. Si llega con
+             valor, se descarta el envio en silencio (ver script). -->
+        <div class="hp-field" aria-hidden="true">
+          <label for="website">Dejar en blanco</label>
+          <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+        </div>
+
         <button type="submit" class="btn btn-primary">Quiero enterarme cuando esté disponible</button>
       </form>
 
@@ -529,7 +539,7 @@
         <p>¡Gracias! Te vamos a escribir apenas se abra el acceso para vinotecas.</p>
       </div>
 
-      <p class="signup-alt">¿Preferís algo más directo? <a href="mailto:franciscoaucar@ajconsultingit.com?subject=CataLog%20para%20vinotecas">Escribinos por mail</a>.</p>
+      <p class="signup-alt">¿Preferís algo más directo? <a href="#" data-contact="email">Escribinos por mail</a> o por <a href="#" data-contact="whatsapp">WhatsApp</a>.</p>
     </div>
   </section>
 
@@ -549,6 +559,19 @@
   </footer>
 
   <script>
+    // Fuente unica de los datos de contacto -- nada de mailto/wa.me
+    // hardcodeado suelto por el HTML, todo sale de aca.
+    const CONTACT = {
+      email: 'franciscoaucar@gmail.com',
+      whatsapp: '543513764462', // E.164 sin "+", formato que espera wa.me
+    };
+    document.querySelectorAll('[data-contact="email"]').forEach((el) => {
+      el.href = 'mailto:' + CONTACT.email + '?subject=' + encodeURIComponent('CataLog para vinotecas');
+    });
+    document.querySelectorAll('[data-contact="whatsapp"]').forEach((el) => {
+      el.href = 'https://wa.me/' + CONTACT.whatsapp + '?text=' + encodeURIComponent('Hola! Quiero saber más sobre CataLog para vinotecas.');
+    });
+
     // Validacion propia en vez del globo nativo del navegador (choca con la
     // card oscura de la marca). Limpia el error apenas el campo se corrige.
     const emailInput = document.getElementById('email');
@@ -566,6 +589,11 @@
 
     document.getElementById('leadForm').addEventListener('submit', function (e) {
       e.preventDefault();
+
+      // Anti-bot: si el honeypot tiene valor, es un bot -- se descarta en
+      // silencio, sin feedback (no delatar el filtro).
+      if (document.getElementById('website').value) return;
+
       const email = emailInput.value.trim();
       const nombre = document.getElementById('nombre').value.trim();
       const dolor = document.getElementById('dolor').value.trim();
@@ -590,7 +618,7 @@
         nombre ? 'Nombre: ' + nombre : null,
         dolor ? 'Le cuesta: ' + dolor : null,
       ].filter(Boolean).join('%0D%0A');
-      const mailtoUrl = 'mailto:franciscoaucar@ajconsultingit.com?subject=Acceso%20anticipado%20CataLog%20para%20vinotecas&body=' + body;
+      const mailtoUrl = 'mailto:' + CONTACT.email + '?subject=' + encodeURIComponent('Acceso anticipado CataLog para vinotecas') + '&body=' + body;
 
       // Success check (representa al cliente sumandose) antes de abrir el mail.
       const form = document.getElementById('leadForm');
