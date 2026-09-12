@@ -26,6 +26,7 @@
     --accent: #C28B38;
     --accent-foreground: #1C1917;
     --success: #2F6B3A;
+    --destructive: #B3261E;
     --border: rgba(28, 25, 23, 0.15);
     --chart-2: #C28B38;
     --font-serif: "Cormorant Garamond", serif;
@@ -49,6 +50,7 @@
       --accent: #D48C46;
       --accent-foreground: #12100F;
       --success: #4C9A5B;
+      --destructive: #D9534F;
       --border: rgba(212, 140, 70, 0.2);
       --chart-2: #9E1B28;
     }
@@ -65,6 +67,7 @@
     --accent: #D48C46;
     --accent-foreground: #12100F;
     --success: #4C9A5B;
+    --destructive: #D9534F;
     --border: rgba(212, 140, 70, 0.2);
     --chart-2: #9E1B28;
   }
@@ -247,7 +250,13 @@
   .field textarea { resize: vertical; min-height: 70px; }
   .field input::placeholder, .field textarea::placeholder { color: var(--muted-foreground); opacity: 1; }
   .field input:focus, .field textarea:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+  .field-error {
+    display: none; margin-top: 6px; font-size: 0.82rem; color: var(--destructive);
+  }
+  .field.invalid input { border-color: var(--destructive); }
+  .field.invalid .field-error { display: block; }
   .consent { display: flex; align-items: flex-start; gap: 10px; font-size: 0.85rem; color: var(--muted-foreground); margin-bottom: 22px; }
+  .consent.invalid { outline: 1px solid var(--destructive); outline-offset: 4px; border-radius: 2px; }
   .consent input { margin-top: 3px; }
   .consent a { color: var(--primary); text-decoration: underline; }
   form .btn-primary { width: 100%; }
@@ -490,10 +499,11 @@
            dueño con los datos precargados (mailto), cero infraestructura
            nueva. Upgrade cuando haga falta: apuntar action a Formspree o a
            un endpoint propio que guarde en la misma Postgres de CataLogApp. -->
-      <form class="paper-card reveal" id="leadForm">
-        <div class="field">
+      <form class="paper-card reveal" id="leadForm" novalidate>
+        <div class="field" id="emailField">
           <label for="email">Email *</label>
-          <input type="email" id="email" name="email" required placeholder="vos@tuvinoteca.com" />
+          <input type="email" id="email" name="email" required placeholder="vos@tuvinoteca.com" aria-describedby="emailError" />
+          <span class="field-error" id="emailError" role="alert"></span>
         </div>
         <div class="field">
           <label for="nombre">Nombre <span class="opt">(opcional)</span></label>
@@ -538,12 +548,42 @@
   </footer>
 
   <script>
+    // Validacion propia en vez del globo nativo del navegador (choca con la
+    // card oscura de la marca). Limpia el error apenas el campo se corrige.
+    const emailInput = document.getElementById('email');
+    const emailField = document.getElementById('emailField');
+    const emailError = document.getElementById('emailError');
+    const consentInput = document.getElementById('consent');
+    const consentLabel = consentInput.closest('.consent');
+
+    emailInput.addEventListener('input', () => {
+      if (emailInput.validity.valid) { emailField.classList.remove('invalid'); emailError.textContent = ''; }
+    });
+    consentInput.addEventListener('change', () => {
+      if (consentInput.checked) consentLabel.classList.remove('invalid');
+    });
+
     document.getElementById('leadForm').addEventListener('submit', function (e) {
       e.preventDefault();
-      const email = document.getElementById('email').value.trim();
+      const email = emailInput.value.trim();
       const nombre = document.getElementById('nombre').value.trim();
       const dolor = document.getElementById('dolor').value.trim();
-      if (!email || !document.getElementById('consent').checked) return;
+
+      let valid = true;
+      if (!emailInput.validity.valid) {
+        emailField.classList.add('invalid');
+        emailError.textContent = email ? 'Revisá el formato del email (ej: vos@tuvinoteca.com).' : 'Ingresá tu email para que te avisemos.';
+        valid = false;
+      }
+      if (!consentInput.checked) {
+        consentLabel.classList.add('invalid');
+        valid = false;
+      }
+      if (!valid) {
+        (emailField.classList.contains('invalid') ? emailInput : consentInput).focus();
+        return;
+      }
+
       const body = [
         'Email: ' + email,
         nombre ? 'Nombre: ' + nombre : null,
