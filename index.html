@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CataLog para vinotecas</title>
+<meta name="description" content="El pedido al distribuidor se decide con la lista de deseos real de tus clientes, no adivinando en la góndola. CataLog para vinotecas: acceso anticipado." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ---------------------------------------------------------------------
+     Tokens calcados 1:1 de src/app/globals.css de CataLogApp (Parchment /
+     Cellar Night) — este landing es un proyecto separado, sin acceso al
+     Tailwind config real, así que los valores se copian a mano acá.
+     --------------------------------------------------------------------- */
+  :root {
+    --background: #FAF5EB;
+    --foreground: #1C1917;
+    --card: #FFFDF9;
+    --primary: #8C0D18;
+    --primary-foreground: #FFFFFF;
+    --secondary: #F0E6D2;
+    --muted: #F0E6D2;
+    --muted-foreground: #6B6560;
+    --accent: #C28B38;
+    --accent-foreground: #1C1917;
+    --success: #2F6B3A;
+    --border: rgba(28, 25, 23, 0.15);
+    --chart-2: #C28B38;
+    --font-serif: "Cormorant Garamond", serif;
+    --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --radius: 0.5rem;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.7rem;
+    --measure: 65ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --background: #12100F;
+      --foreground: #F4EBE1;
+      --card: #1C1917;
+      --primary: #D48C46;
+      --primary-foreground: #12100F;
+      --secondary: #2B2522;
+      --muted: #2B2522;
+      --muted-foreground: #C4B8AC;
+      --accent: #D48C46;
+      --accent-foreground: #12100F;
+      --success: #4C9A5B;
+      --border: rgba(212, 140, 70, 0.2);
+      --chart-2: #9E1B28;
+    }
+  }
+  :root[data-theme="dark"] {
+    --background: #12100F;
+    --foreground: #F4EBE1;
+    --card: #1C1917;
+    --primary: #D48C46;
+    --primary-foreground: #12100F;
+    --secondary: #2B2522;
+    --muted: #2B2522;
+    --muted-foreground: #C4B8AC;
+    --accent: #D48C46;
+    --accent-foreground: #12100F;
+    --success: #4C9A5B;
+    --border: rgba(212, 140, 70, 0.2);
+    --chart-2: #9E1B28;
+  }
+
+  * { box-sizing: border-box; }
+  html { color-scheme: light dark; }
+  ::selection { background: var(--primary); color: var(--primary-foreground); }
+  body {
+    margin: 0;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, .serif { font-family: var(--font-serif); font-weight: 600; letter-spacing: -0.02em; }
+  a { color: inherit; }
+  img { max-width: 100%; display: block; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 96px 0; }
+  section + section { border-top: 1px solid var(--border); }
+
+  /* -- gingham divider (motivo real de la marca, ver globals.css .trattoria-gingham-bar) -- */
+  .gingham {
+    height: 6px;
+    background-image: repeating-linear-gradient(
+      45deg,
+      var(--primary) 0, var(--primary) 8px,
+      var(--background) 8px, var(--background) 16px,
+      var(--chart-2) 16px, var(--chart-2) 24px,
+      var(--card) 24px, var(--card) 32px
+    );
+  }
+
+  .paper-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 2px 6px rgba(28, 25, 23, 0.06);
+  }
+
+  /* -- header -- */
+  header {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in oklab, var(--background) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; height: 76px; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-mark { font-family: var(--font-serif); font-size: 1.5rem; font-weight: 700; }
+  .logo-img { height: 40px; width: 40px; border-radius: 8px; object-fit: cover; }
+  footer .logo-img { height: 32px; width: 32px; }
+  .brand-tag {
+    font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted-foreground); border-left: 1px solid var(--border); padding-left: 10px;
+  }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--font-sans); font-weight: 600; font-size: 0.95rem;
+    border-radius: var(--radius); border: 1px solid transparent;
+    padding: 12px 22px; cursor: pointer; text-decoration: none;
+    transition: transform 0.15s cubic-bezier(0.16,1,0.3,1), box-shadow 0.15s ease, background-color 0.15s ease;
+  }
+  .btn-primary { background: var(--primary); color: var(--primary-foreground); }
+  /* recipe matched to .dark .paper-card-hover:hover in CataLogApp/src/app/globals.css */
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 16px 32px -8px color-mix(in oklab, var(--primary) 28%, transparent); }
+  .btn-ghost { background: transparent; color: var(--foreground); border-color: var(--border); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-sm { padding: 9px 16px; font-size: 0.85rem; }
+
+  /* -- hero -- */
+  .hero { padding: 88px 0 72px; }
+  .hero-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 56px; align-items: center; }
+  .hero h1 { font-size: clamp(2.2rem, 4vw, 3.4rem); line-height: 1.08; margin: 0 0 22px; max-width: 16ch; }
+  .hero .lede { font-size: 1.15rem; color: var(--muted-foreground); max-width: 46ch; margin: 0 0 32px; }
+  .hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+  .hero-note { font-size: 0.85rem; color: var(--muted-foreground); }
+
+  .demo-card { padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+  .demo-you-said {
+    background: var(--muted); border-radius: var(--radius); padding: 16px 18px;
+    font-style: italic; font-size: 0.95rem; color: var(--foreground);
+  }
+  .demo-label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted-foreground); margin-bottom: 8px; display: block; }
+  .demo-arrow { text-align: center; color: var(--accent); font-size: 1.3rem; }
+  .demo-signal { background: var(--foreground); color: var(--background); border-radius: var(--radius); padding: 18px; }
+  .demo-signal .demo-label { color: color-mix(in oklab, var(--background) 60%, transparent); }
+  .demo-signal .wine-name { font-family: var(--font-serif); font-size: 1.4rem; font-weight: 600; }
+  .demo-signal .wine-meta { font-size: 0.85rem; opacity: 0.75; margin-top: 2px; }
+  .demo-signal .demand-badge {
+    display: inline-flex; align-items: center; gap: 6px; margin-top: 14px;
+    background: var(--accent); color: var(--accent-foreground);
+    border-radius: 999px; padding: 6px 14px; font-size: 0.8rem; font-weight: 600;
+  }
+  .illustrative { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted-foreground); text-align: center; }
+
+  /* -- problem -- */
+  .problem .wrap { max-width: 780px; }
+  .problem h2 { font-size: clamp(1.8rem, 3vw, 2.5rem); margin: 0 0 24px; }
+  .problem p { font-size: 1.08rem; color: var(--muted-foreground); max-width: var(--measure); }
+  .problem strong { color: var(--foreground); }
+
+  /* -- features -- */
+  .features h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); max-width: 20ch; margin: 0 0 56px; }
+  .feature-row { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; margin-bottom: 88px; }
+  .feature-row:last-child { margin-bottom: 0; }
+  .feature-row:nth-child(even) .feature-copy { order: 2; }
+  .feature-copy h3 { font-size: 1.6rem; margin: 0 0 14px; }
+  .feature-copy p { color: var(--muted-foreground); font-size: 1.02rem; max-width: 42ch; }
+  .feature-visual { padding: 28px; }
+  .feature-visual .mini-label { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted-foreground); margin-bottom: 10px; }
+  .wishlist-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border); font-size: 0.92rem; }
+  .wishlist-row:last-child { border-bottom: none; }
+  .wishlist-count { font-weight: 700; color: var(--primary); }
+
+  /* -- product screenshots -- */
+  .product .wrap { text-align: center; }
+  .product h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); margin: 0 0 8px; }
+  .product .honest { color: var(--muted-foreground); margin: 0 0 48px; font-size: 1rem; }
+  .shots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; text-align: left; }
+  .shot figure { margin: 0; }
+  .shot img {
+    width: 100%; border-radius: var(--radius-xl); border: 1px solid var(--border);
+    box-shadow: 0 16px 32px -16px rgba(28,25,23,0.25);
+  }
+  .shot figcaption { margin-top: 14px; font-size: 0.92rem; color: var(--muted-foreground); }
+
+  /* -- honesty / status -- */
+  .status { text-align: center; }
+  .status .wrap { max-width: 640px; }
+  .status p { color: var(--muted-foreground); font-size: 1.02rem; }
+
+  /* -- FAQ -- */
+  .faq .wrap { max-width: 760px; }
+  .faq h2 { font-size: clamp(1.8rem, 3vw, 2.2rem); margin: 0 0 40px; }
+  .faq-item { border-bottom: 1px solid var(--border); padding: 22px 0; }
+  .faq-item:first-child { border-top: 1px solid var(--border); }
+  .faq-item h3 { font-family: var(--font-sans); font-size: 1.05rem; font-weight: 600; margin: 0 0 8px; }
+  .faq-item p { color: var(--muted-foreground); margin: 0; max-width: var(--measure); }
+
+  /* -- signup -- */
+  .signup { text-align: center; }
+  .signup h2 { font-size: clamp(1.9rem, 3.4vw, 2.6rem); margin: 0 0 12px; max-width: 20ch; margin-left: auto; margin-right: auto; }
+  .signup .lede { color: var(--muted-foreground); margin: 0 0 40px; }
+  form.paper-card { max-width: 480px; margin: 0 auto; padding: 36px; text-align: left; }
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px; }
+  .field label .opt { font-weight: 400; color: var(--muted-foreground); text-transform: none; }
+  .field input, .field textarea {
+    width: 100%; font-family: var(--font-sans); font-size: 0.95rem;
+    background: var(--background); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 11px 13px; color: var(--foreground);
+  }
+  .field textarea { resize: vertical; min-height: 70px; }
+  .field input:focus, .field textarea:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+  .consent { display: flex; align-items: flex-start; gap: 10px; font-size: 0.85rem; color: var(--muted-foreground); margin-bottom: 22px; }
+  .consent input { margin-top: 3px; }
+  .consent a { color: var(--primary); text-decoration: underline; }
+  form .btn-primary { width: 100%; }
+  .signup-alt { margin-top: 16px; font-size: 0.9rem; color: var(--muted-foreground); text-align: center; }
+  .signup-alt a { color: var(--primary); font-weight: 600; text-decoration: underline; }
+
+  /* -- footer -- */
+  footer { padding: 40px 0; }
+  footer .wrap { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  footer .brand-mark { font-size: 1.1rem; }
+  footer nav { display: flex; gap: 22px; font-size: 0.85rem; color: var(--muted-foreground); }
+  footer nav a:hover { color: var(--primary); }
+
+  @media (max-width: 980px) {
+    .shots { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 860px) {
+    section { padding: 64px 0; }
+    .hero { padding: 48px 0 56px; }
+    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+    .feature-row { grid-template-columns: 1fr; gap: 28px; margin-bottom: 56px; }
+    .feature-row:nth-child(even) .feature-copy { order: 0; }
+    header .brand-tag { display: none; }
+  }
+
+  @media (max-width: 520px) {
+    .shots { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="wrap">
+      <div class="brand">
+        <img src="assets/logo.png" alt="CataLog" class="logo-img" />
+        <span class="brand-mark">CataLog</span>
+        <span class="brand-tag">Para vinotecas</span>
+      </div>
+      <a href="#acceso" class="btn btn-primary btn-sm">Quiero enterarme</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <h1>El pedido al distribuidor se decide mirando la góndola. No la demanda real de tus clientes.</h1>
+        <p class="lede">Tus clientes ya guardan los vinos que quieren en su propia bitácora. Con CataLog, esa lista es la mejor pista que vas a tener de qué reponer antes de que te lo pidan.</p>
+        <div class="hero-ctas">
+          <a href="#acceso" class="btn btn-primary">Quiero enterarme cuando esté disponible</a>
+          <a href="mailto:franciscoaucar@ajconsultingit.com?subject=CataLog%20para%20vinotecas" class="btn btn-ghost">Prefiero escribir por mail</a>
+        </div>
+        <p class="hero-note">Hoy el acceso para vinotecas está en construcción. Dejá tu email y te avisamos apenas se abra.</p>
+      </div>
+
+      <div class="paper-card demo-card">
+        <div>
+          <span class="demo-label">Su lista de deseos</span>
+          <div class="demo-you-said">"Cabernet Franc, Valle de Uco — para probar cuando consiga."</div>
+        </div>
+        <div class="demo-arrow">↓</div>
+        <div class="demo-signal">
+          <span class="demo-label">Señal de pedido</span>
+          <div class="wine-name">Cabernet Franc</div>
+          <div class="wine-meta">Valle de Uco, Mendoza</div>
+          <span class="demand-badge">🍷 3 clientes de tu vinoteca lo guardaron esta semana</span>
+        </div>
+        <p class="illustrative">Ejemplo ilustrativo</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="gingham"></div>
+
+  <section class="problem">
+    <div class="wrap">
+      <h2>Hoy lo llevás en la cabeza, en el remito del distribuidor y en lo que se te ocurre parado en la góndola.</h2>
+      <p>Pedís por instinto, por lo que se vendió el mes pasado, o porque un cliente lo comentó al pasar y ya no te acordás bien qué era. Mientras tanto, esa misma persona ya anotó el vino exacto que quiere en su teléfono, en una lista que vos no ves, en una app que ni sabés que usa.</p>
+      <p><strong>El problema no es que no conozcas a tus clientes. Es que su demanda real vive en un lugar que hoy no te contesta.</strong></p>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="wrap">
+      <h2>Tres cosas que hace por vos, no tres funciones en una lista.</h2>
+
+      <div class="feature-row">
+        <div class="feature-copy">
+          <h3>Ya quieren llevar su propia bitácora. Vos solo aprovechás esa costumbre.</h3>
+          <p>Escanean la etiqueta con el celular y CataLog completa bodega, cepa y añada solo, con la misma foto que ya le sacan a la botella antes de decidir si la compran, sin que vos tengas que empujar ningún formulario nuevo.</p>
+        </div>
+        <div class="paper-card feature-visual">
+          <div class="mini-label">Escaneo de etiqueta con IA</div>
+          <div class="wishlist-row"><span>📷 Foto de la etiqueta</span><span>→</span></div>
+          <div class="wishlist-row"><span>Bodega, cepa, añada</span><span class="wishlist-count">autocompletado</span></div>
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-copy">
+          <h3>Lo que guardan en su lista de deseos es tu pedido de mañana.</h3>
+          <p>Cada botella que un cliente marca como "quiero conseguir" queda asociada a tu vinoteca. Vos ves el ranking real de lo que se busca y todavía no tenés, antes de perder la venta por no tenerlo en la góndola.</p>
+        </div>
+        <div class="paper-card feature-visual">
+          <div class="mini-label">Top de la semana</div>
+          <div class="wishlist-row"><span>Cabernet Franc, Valle de Uco</span><span class="wishlist-count">3 clientes</span></div>
+          <div class="wishlist-row"><span>Torrontés, Cafayate</span><span class="wishlist-count">2 clientes</span></div>
+          <div class="wishlist-row"><span>Malbec orgánico</span><span class="wishlist-count">1 cliente</span></div>
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-copy">
+          <h3>Un resumen simple una vez al mes, no otra planilla para mantener.</h3>
+          <p>La idea es que cada tanto te llegue lo esencial (cuántos clientes activaron el canal, qué buscan y no tenés) sin que vos tengas que ir a buscarlo. Todavía lo estamos armando; por eso este acceso anticipado.</p>
+        </div>
+        <div class="paper-card feature-visual">
+          <div class="mini-label">Informe mensual</div>
+          <div class="wishlist-row"><span>Clientes activos este mes</span><span class="wishlist-count">—</span></div>
+          <div class="wishlist-row"><span>Etiquetas más buscadas</span><span class="wishlist-count">—</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="gingham"></div>
+
+  <section class="product">
+    <div class="wrap">
+      <h2>La base ya existe y se usa todos los días</h2>
+      <p class="honest">Sin mockups ni datos inventados: lo que ves abajo es la app real, cargada con vinos reales.</p>
+      <div class="shots">
+        <div class="shot">
+          <figure>
+            <img src="screens/coverflow.png" alt="Ficha visual de un vino en CataLog, con foto real de la botella y datos de servicio" width="496" height="914" />
+            <figcaption>Ficha visual de cada botella, con foto real.</figcaption>
+          </figure>
+        </div>
+        <div class="shot">
+          <figure>
+            <img src="screens/sommelier.png" alt="Chat del Sommelier IA de CataLog guiando una cata paso a paso" width="501" height="913" />
+            <figcaption>Sommelier IA: guía la cata y arma la ficha solo.</figcaption>
+          </figure>
+        </div>
+        <div class="shot">
+          <figure>
+            <img src="screens/detalle.png" alt="Detalle de un vino en CataLog, con temperatura de servicio sugerida y notas de cata" width="498" height="915" />
+            <figcaption>Temperatura de servicio y notas de cata.</figcaption>
+          </figure>
+        </div>
+        <div class="shot">
+          <figure>
+            <img src="screens/stats.png" alt="Panel de estadísticas de CataLog con KPIs de consumo" width="493" height="911" />
+            <figcaption>Estadísticas de consumo de cada usuario.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="status">
+    <div class="wrap">
+      <p>CataLog ya está en uso real todos los días, cargando cava propia. La versión para vinotecas (con QR de local, agregación de demanda e informe mensual) es la que estás por probar vos entre los primeros.</p>
+    </div>
+  </section>
+
+  <section class="faq">
+    <div class="wrap">
+      <h2>Antes de que preguntes</h2>
+
+      <div class="faq-item">
+        <h3>¿Mis clientes tienen que bajarse otra app aparte?</h3>
+        <p>No aparte de CataLog: es la misma app donde ya cargan su cava personal. Escanean el QR de tu local una vez y quedan vinculados a tu vinoteca desde ahí.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>¿Tengo que cargar mi catálogo a mano?</h3>
+        <p>Sí, pero no arrancás de cero: tu vinoteca se crea con un catálogo de ejemplo precargado para que veas cómo se ve antes de reemplazarlo por el tuyo.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>¿Cuánto cuesta?</h3>
+        <p>Todavía no cobramos nada. Cuando se abra, arranca con un trial gratis de 15 días con autoservicio completo. Dejá tu email y sos de los primeros en probarlo.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>¿Mis datos y los de mis clientes están seguros?</h3>
+        <p>Se accede con Google o con usuario y contraseña propios, y el detalle completo de qué se guarda y para qué está en la <a href="https://catalog-wines.vercel.app/privacidad">Política de Privacidad</a> real de CataLog.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="signup" id="acceso">
+    <div class="wrap">
+      <h2>¿Seguís pidiendo por instinto?</h2>
+      <p class="lede">Dejá que la lista de deseos de tus propios clientes te lo diga.</p>
+
+      <!-- ponytail: sin backend propio todavía — el submit abre el mail del
+           dueño con los datos precargados (mailto), cero infraestructura
+           nueva. Upgrade cuando haga falta: apuntar action a Formspree o a
+           un endpoint propio que guarde en la misma Postgres de CataLogApp. -->
+      <form class="paper-card" id="leadForm">
+        <div class="field">
+          <label for="email">Email *</label>
+          <input type="email" id="email" name="email" required placeholder="vos@tuvinoteca.com" />
+        </div>
+        <div class="field">
+          <label for="nombre">Nombre <span class="opt">(opcional)</span></label>
+          <input type="text" id="nombre" name="nombre" placeholder="Tu nombre o el de tu vinoteca" />
+        </div>
+        <div class="field">
+          <label for="dolor">¿Qué es lo que más te cuesta hoy para decidir qué reponer? <span class="opt">(opcional)</span></label>
+          <textarea id="dolor" name="dolor" placeholder="Contanos en una línea..."></textarea>
+        </div>
+        <label class="consent">
+          <input type="checkbox" id="consent" required />
+          <span>Acepto la <a href="https://catalog-wines.vercel.app/privacidad">Política de Privacidad</a> y que me contacten sobre CataLog para vinotecas.</span>
+        </label>
+        <button type="submit" class="btn btn-primary">Quiero enterarme cuando esté disponible</button>
+      </form>
+      <p class="signup-alt">¿Preferís algo más directo? <a href="mailto:franciscoaucar@ajconsultingit.com?subject=CataLog%20para%20vinotecas">Escribinos por mail</a>.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div class="brand">
+        <img src="assets/logo.png" alt="CataLog" class="logo-img" />
+        <span class="brand-mark">CataLog</span>
+      </div>
+      <nav>
+        <a href="https://catalog-wines.vercel.app/privacidad">Privacidad</a>
+        <a href="https://catalog-wines.vercel.app">La app</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('leadForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const nombre = document.getElementById('nombre').value.trim();
+      const dolor = document.getElementById('dolor').value.trim();
+      if (!email || !document.getElementById('consent').checked) return;
+      const body = [
+        'Email: ' + email,
+        nombre ? 'Nombre: ' + nombre : null,
+        dolor ? 'Le cuesta: ' + dolor : null,
+      ].filter(Boolean).join('%0D%0A');
+      window.location.href = 'mailto:franciscoaucar@ajconsultingit.com?subject=Acceso%20anticipado%20CataLog%20para%20vinotecas&body=' + body;
+    });
+  </script>
+
+</body>
+</html>
