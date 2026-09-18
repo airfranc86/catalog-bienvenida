@@ -560,7 +560,7 @@
         <p>¡Gracias! Te vamos a escribir apenas se abra el acceso para vinotecas.</p>
       </div>
 
-      <p class="signup-alt">¿Preferís algo más directo? <a href="#" data-contact="email">Escribinos por mail</a> o por <a href="#" data-contact="whatsapp">WhatsApp</a>.</p>
+      <p class="signup-alt">¿Preferís algo más directo? Escribinos a <a href="#" data-contact="email">nuestro correo</a> o por <a href="#" data-contact="whatsapp">WhatsApp</a>.</p>
     </div>
   </section>
 
@@ -588,6 +588,10 @@
     };
     document.querySelectorAll('[data-contact="email"]').forEach((el) => {
       el.href = 'mailto:' + CONTACT.email + '?subject=' + encodeURIComponent('CataLog para vinotecas');
+      // Direccion visible como texto del link: sin un programa de correo
+      // asociado a mailto: (comun con webmail) el click no hace nada, y asi
+      // igual se puede leer y copiar.
+      el.textContent = CONTACT.email;
     });
     document.querySelectorAll('[data-contact="whatsapp"]').forEach((el) => {
       el.href = 'https://wa.me/' + CONTACT.whatsapp + '?text=' + encodeURIComponent('Hola! Quiero saber más sobre CataLog para vinotecas.');
