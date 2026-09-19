@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>CataLog para vinotecas</title>
 <link rel="icon" type="image/png" href="assets/favicon.png">
+<meta name="theme-color" content="#FAF5EB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12100F" media="(prefers-color-scheme: dark)">
 <meta name="description" content="Tus clientes ya anotan en CataLog qué vinos quieren tomar. Esa lista te dice qué pedirle al distribuidor. CataLog para vinotecas: acceso anticipado." />
 <!-- Vista previa al compartir el link (WhatsApp, Telegram, etc.). Falta og:image:
      necesita una imagen de 1200x630 y la URL absoluta del dominio final. -->
@@ -98,6 +100,12 @@
   * { box-sizing: border-box; }
   html { color-scheme: light dark; }
   ::selection { background: var(--primary); color: var(--primary-foreground); }
+  /* Foco de teclado y checkbox con el color de marca: por defecto el navegador
+     usa un aro y un azul ajenos a la paleta. En la banda inversa el aro toma
+     el color del texto (primary no contrasta contra esa superficie). */
+  :focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+  .product :focus-visible { outline-color: currentColor; }
+  input[type="checkbox"] { accent-color: var(--primary); }
   body {
     margin: 0;
     background: var(--background);
@@ -108,7 +116,7 @@
     letter-spacing: var(--track-body);
   }
   /* Titulos en serif: interlineado propio (antes heredaban el 1.5 del cuerpo). */
-  h1, h2, h3, .serif { font-family: var(--font-serif); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; text-wrap: balance; }
+  h1, h2, h3 { font-family: var(--font-serif); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; text-wrap: balance; }
   p { line-height: 1.6; text-wrap: pretty; }
   a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 0.08em; }
   img { max-width: 100%; display: block; }
@@ -156,7 +164,7 @@
     display: inline-flex; align-items: center; justify-content: center;
     font-family: var(--font-sans); font-weight: 600; font-size: 0.95rem;
     border-radius: var(--radius); border: 1px solid transparent;
-    padding: 12px 22px; cursor: pointer; text-decoration: none;
+    padding: 12px 22px; cursor: pointer; text-decoration: none; text-align: center;
     transition: transform 0.15s cubic-bezier(0.16,1,0.3,1), box-shadow 0.15s ease, background-color 0.15s ease;
   }
   .btn-primary { background: var(--primary); color: var(--primary-foreground); }
@@ -164,8 +172,6 @@
   .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 16px 32px -8px color-mix(in oklab, var(--primary) 28%, transparent); }
   .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn-primary:disabled:hover { transform: none; box-shadow: none; }
-  .btn-ghost { background: transparent; color: var(--foreground); border-color: var(--border); }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
   .btn-sm { padding: 11px 16px; font-size: 0.85rem; }
 
   /* -- hero -- */
@@ -246,9 +252,10 @@
   .feature-copy p { color: var(--muted-foreground); font-size: var(--fs-body); max-width: 42ch; }
   .feature-visual { padding: 28px; }
   .feature-visual .mini-label { font-size: var(--fs-label); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted-foreground); margin-bottom: 10px; }
-  .wishlist-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border); font-size: 0.92rem; }
-  .wishlist-row:last-child { border-bottom: none; }
-  .wishlist-count { font-weight: 700; color: var(--primary); font-variant-numeric: tabular-nums; }
+  .feature-visual .illustrative { margin: 14px 0 0; }
+  .wishlist-row { display: flex; justify-content: space-between; align-items: center; gap: 4px; padding: 10px 0; border-bottom: 1px dashed var(--border); font-size: 0.92rem; }
+  .wishlist-row:last-of-type { border-bottom: none; }
+  .wishlist-count { font-weight: 700; color: var(--primary); font-variant-numeric: tabular-nums; white-space: nowrap; flex-shrink: 0; }
 
   /* -- product screenshots: carrusel "free mode" (sin snap, arrastre libre
      con mouse o touch) — mismo espiritu que el modulo free-mode de Swiper,
@@ -262,12 +269,14 @@
   .product .honest { color: color-mix(in oklab, var(--background) 72%, transparent); margin: 0 0 40px; font-size: var(--fs-body); }
   .shots {
     display: flex; gap: 24px; text-align: left;
-    overflow-x: auto; cursor: grab; user-select: none;
+    overflow-x: auto; user-select: none;
     padding: 4px 24px; margin: 0 -24px;
     scrollbar-width: none;
   }
   .shots::-webkit-scrollbar { display: none; }
+  .shots.scrollable { cursor: grab; }
   .shots.dragging { cursor: grabbing; scroll-behavior: auto; }
+  .shots:focus-visible { outline-offset: -6px; }
   .shot { flex: 0 0 clamp(200px, 23vw, 250px); }
   .shot figure { margin: 0; }
   .shot img {
@@ -296,7 +305,6 @@
   .faq .wrap > * { max-width: 712px; }
   .faq h2 { font-size: var(--fs-h2); margin: 0 0 40px; }
   .faq-item { border-bottom: 1px solid var(--border); padding: 22px 0; }
-  .faq-item:first-child { border-top: 1px solid var(--border); }
   .faq-item h3 { font-family: var(--font-sans); font-size: 1.05rem; font-weight: 600; line-height: 1.35; margin: 0 0 8px; }
   .faq-item p { color: var(--muted-foreground); font-size: var(--fs-body); margin: 0; max-width: var(--measure); }
 
@@ -405,6 +413,7 @@
     .feature-row { grid-template-columns: 1fr; gap: 28px; margin-bottom: 56px; }
     .feature-row:nth-child(even) .feature-copy { order: 0; }
     header .brand-tag { display: none; }
+    footer nav a { padding: 11px 0; }
   }
 </style>
 </head>
@@ -413,7 +422,7 @@
   <header>
     <div class="wrap">
       <div class="brand">
-        <img src="assets/logo.png" alt="CataLog" class="logo-img" />
+        <img src="assets/logo.png" alt="" class="logo-img" />
         <span class="brand-mark">CataLog</span>
         <span class="brand-tag">Para vinotecas</span>
       </div>
@@ -501,6 +510,7 @@
           <div class="wishlist-row"><span>Cabernet Franc, Valle de Uco</span><span class="wishlist-count">3 clientes</span></div>
           <div class="wishlist-row"><span>Torrontés, Cafayate</span><span class="wishlist-count">2 clientes</span></div>
           <div class="wishlist-row"><span>Malbec orgánico</span><span class="wishlist-count">1 cliente</span></div>
+          <p class="illustrative">Ejemplo ilustrativo</p>
         </div>
       </div>
 
@@ -524,7 +534,7 @@
     <div class="wrap">
       <h2>La base ya existe y se usa todos los días</h2>
       <p class="honest">Sin mockups ni datos inventados: lo que ves abajo es la app real, cargada con vinos reales.</p>
-      <div class="shots reveal-group">
+      <div class="shots reveal-group" role="region" aria-label="Capturas de la app">
         <div class="shot reveal">
           <figure>
             <img src="screens/coverflow.png" alt="Ficha visual de un vino en CataLog, con foto real de la botella y datos de servicio" width="496" height="914" loading="lazy" decoding="async" />
@@ -659,7 +669,7 @@
   <footer>
     <div class="wrap">
       <div class="brand">
-        <img src="assets/logo.png" alt="CataLog" class="logo-img" />
+        <img src="assets/logo.png" alt="" class="logo-img" />
         <span class="brand-mark">CataLog</span>
       </div>
       <p class="footer-credit">Hecho por Francisco Aucar · Argentina</p>
@@ -850,6 +860,16 @@
       shots.addEventListener('lostpointercapture', endDrag);
       // Evita que el drag dispare el click en un link/boton adentro de una card.
       shots.addEventListener('click', (e) => { if (moved) e.preventDefault(); }, true);
+      // Solo se ofrece como carrusel cuando desborda (a 1280 entran las cuatro):
+      // mano de arrastre y foco de teclado unicamente entonces.
+      function syncScrollable() {
+        const scrollable = shots.scrollWidth > shots.clientWidth + 1;
+        shots.classList.toggle('scrollable', scrollable);
+        if (scrollable) shots.setAttribute('tabindex', '0');
+        else shots.removeAttribute('tabindex');
+      }
+      syncScrollable();
+      window.addEventListener('resize', syncScrollable);
     }
 
     // Fondo ambiental del hero: 3 manchas de gradiente radial en los tonos
